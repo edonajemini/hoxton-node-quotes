@@ -1,8 +1,5 @@
 import express from "express"
-const app = express()
-const port = 4000
-
- 
+import cors from "cors"
 const quotes = [
     {
         id:1,
@@ -45,6 +42,10 @@ const quotes = [
         quote:"Spread love everywhere you go. Let no one ever come to you without leaving happier. "
     }
 ]
+const app = express()
+app.use(cors())
+const port = 4000
+
 
 app.get('/', (req, res) => {
   res.send(`
@@ -58,7 +59,7 @@ app.get('/quotes', (req, res) => {
     res.send(quotes)
 })
 
-
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
