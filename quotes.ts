@@ -1,6 +1,7 @@
 import express from "express"
 const app = express()
 const port = 4000
+
  
 const quotes = [
     {
@@ -46,11 +47,18 @@ const quotes = [
 ]
 
 app.get('/', (req, res) => {
-  res.send("Famous quotes")
+  res.send(`
+  <h2>Famous Quotes!</h2>
+    <p>Most Famous Quotes of All Time:</p>
+      <a href="/quotes">Quotes</a>
+  `)
 })
+
 app.get('/quotes', (req, res) => {
     res.send(quotes)
-  })
+})
+
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
