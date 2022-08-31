@@ -58,6 +58,17 @@ app.get('/', (req, res) => {
 app.get('/quotes', (req, res) => {
     res.send(quotes)
 })
+app.get ('/quotes/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const sameid = quotes.find(quote => quote.id ===id)
+    if (sameid) {
+        res.send(sameid)
+    }
+    else {
+        res.status(404).send({ error: `Quote doesn't exist!` })
+    }
+}
+)
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
