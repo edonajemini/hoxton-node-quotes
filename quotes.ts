@@ -93,6 +93,39 @@ app.get ('/quotes/:id', (req, res) => {
     }
 }
 )
+app.post('/quotes', (req, res) => {
+    let errors: string[] = []
+    if (typeof req.body.name !== 'string') {
+        errors.push('Add a proper name!')
+      }
+    if (typeof req.body.lastname !== 'string') {
+        errors.push('Add a proper lastname!')
+    }
+    if (typeof req.body.age ! == 'string' ){
+        errors.push('Add a proper age!')
+    }
+    if (typeof req.body.Image ! == 'string' ){
+        errors.push('Add a proper image!')
+    }
+    if(typeof req.body.quote  ! =='string') {
+        errors.push('Add a proper quote')
+    }
+    if( errors.length === 0)  {
+        const newquote = {
+            id: quotes[quotes.length - 1].id + 1,
+            name:req.body.name,
+            lastname: req.body.lastname,
+            age: req.body.age,
+            Image: req.body.Image,
+            quote: req.body.quote
+        }
+        quotes.push(newquote)
+        res.send(newquote)
+    }
+    else {
+        res.status(400).send({ errors: errors })
+      }
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
