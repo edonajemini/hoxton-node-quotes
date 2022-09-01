@@ -1,6 +1,8 @@
 import express from "express"
 import cors from "cors"
-import { quotes, authors } from './data'
+import { DataQuotes, authors } from './DataQuotes'
+
+let quotes = DataQuotes
 
 const app = express()
 app.use(cors())
@@ -65,6 +67,19 @@ app.post('/quotes', (req, res) => {
         res.status(400).send({ errors: errors })
       }
 })
+
+app.delete('/quotes/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const indextodelete = quotes.findIndex(quote => quote.id === id)
+    if (indextodelete > -1 ) {
+      quotes = quotes.filter( quote => quote.id !== id)
+        res.send({ message: 'Quote deleted successfully.' })
+    }
+    else {
+        res.status(404).send({ error: 'Qoute not found.' })
+      }
+})
+
 
 
 app.listen(port, () => {

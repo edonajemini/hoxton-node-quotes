@@ -5,7 +5,7 @@ type Quotes = {
     quote: string
   }
   
-export const quotes: Quotes[] =[
+export const DataQuotes: Quotes[] =[
     {
         id:1,
         authorId: 1,
