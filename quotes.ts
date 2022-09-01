@@ -1,6 +1,6 @@
 import express from "express"
 import cors from "cors"
-import { DataQuotes, authors } from './DataQuotes'
+import { DataQuotes, authors } from './data'
 
 let quotes = DataQuotes
 
@@ -8,8 +8,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 const port = 4000
-
-
 
 app.get('/', (req, res) => {
   res.send(`
@@ -119,6 +117,54 @@ app.delete('/quotes/:id', (req, res) => {
       }
 })
 
+app.patch('/quotes/:id', (req, res) => {
+
+    let id = Number(req.params.id)
+    let match = quotes.find(quote => quote.id === id)
+
+    if (match) {
+      if (req.body.quote) {
+        match.quote = req.body.quote
+      }
+  
+      if (req.body.authorId) {
+        match.authorId = req.body.authorId
+      }
+  
+      res.send(match)
+    } else {
+
+      res.status(404).send({ error: 'Quote not found.' })
+    }
+  })
+  
+app.patch('/authors/:id', (req, res) => {
+
+    let id = Number(req.params.id)
+    let match = authors.find(author => author.id === id)
+
+    if (match) {
+      if (req.body.name) {
+        match.name = req.body.name
+      }
+      if (req.body.lastname) {
+        match.lastname = req.body.lastname
+      }
+      if (req.body.age) {
+        match.age = req.body.age
+      }
+
+      if (req.body.image) {
+        match.image = req.body.image
+      }
+  
+      res.send(match)
+    } else {
+
+      res.status(404).send({ error: 'Author not found.' })
+    }
+  })
+  
 
 
 app.listen(port, () => {
