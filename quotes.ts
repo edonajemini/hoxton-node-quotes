@@ -26,6 +26,13 @@ app.get('/quotes', (req, res) => {
     })
     res.send(displayedquotes )
 })
+app.get('/authors', (req, res) => {
+    let displayedauthors = authors.map(author =>{
+        let quote = quotes.find(quote => quote.authorId === author.id)
+        return{...author, quote}
+    })
+    res.send(displayedauthors )
+})
 
 app.get ('/quotes/:id', (req, res) => {
     const id = Number(req.params.id)
@@ -45,7 +52,7 @@ app.post('/quotes', (req, res) => {
         errors.push('Add a proper ID!')
       }
    
-    if(typeof req.body.quote  ! =='number') {
+    if(typeof req.body.quote  !=='string') {
         errors.push('Add a proper quote')
     }
     let author = authors.find(author => author.id=== req.body.authorId)
@@ -62,6 +69,38 @@ app.post('/quotes', (req, res) => {
     
         quotes.push(newquote)
         res.send(newquote)
+    }
+    else {
+        res.status(400).send({ errors: errors })
+      }
+})
+app.post('/authors', (req, res) => {
+    let errors: string[] = []
+   
+    if(typeof req.body.name !=='string') {
+        errors.push('Add a proper name')
+    }
+    if(typeof req.body.lastname !=='string') {
+        errors.push('Add a proper lastname')
+    }
+    if(typeof req.body.age !=='string') {
+        errors.push('Add a proper age')
+    }
+    if(typeof req.body.image !=='string') {
+        errors.push('Add a proper url')
+    }
+  
+    if( errors.length === 0)  {
+        const newauthor = {
+            id: quotes[quotes.length - 1].id + 1,
+            name:req.body.name,
+            lastname: req.body.lastname,
+            age: req.body.age,
+            image: req.body.image
+        }
+    
+        authors.push(newauthor)
+        res.send(newauthor)
     }
     else {
         res.status(400).send({ errors: errors })
