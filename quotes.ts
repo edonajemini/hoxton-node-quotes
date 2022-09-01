@@ -45,7 +45,7 @@ app.post('/quotes', (req, res) => {
         errors.push('Add a proper ID!')
       }
    
-    if(typeof req.body.quote  ! =='string') {
+    if(typeof req.body.quote  ! =='number') {
         errors.push('Add a proper quote')
     }
     let author = authors.find(author => author.id=== req.body.authorId)
