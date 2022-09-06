@@ -53,6 +53,19 @@ CREATE TABLE IF NOT EXISTS quotes (
   );
 `)
 createquotestable.run()
+
+const deleteQuotes = db.prepare(`
+DELETE from quotes;
+`)
+deleteQuotes.run()
+
+const creaateQuotes = db.prepare(`
+INSERT INTO quotes (quote, authorId) VALUES (?,?);
+`)
+for (let quote of quotes) {
+    creaateQuotes.run(quote.quote, quote.authorId)
+}
+
 }
 function createauthors(){
 const authors = [
@@ -130,6 +143,18 @@ CREATE TABLE IF NOT EXISTS authors (
   );
 `)
 createauthorstable.run()
+
+
+const deleteAuthors = db.prepare(`
+DELETE from authors;
+`)
+deleteAuthors.run()
+const creaateAuthors = db.prepare(`
+INSERT INTO authors (name, lastname, age, image) VALUES (?,?,?,?);
+`)
+for (let author of authors) {
+    creaateAuthors.run(author.name, author.lastname, author.age, author.image)
+}
 }
 
 createquotes()
