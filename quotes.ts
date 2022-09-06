@@ -2,6 +2,7 @@ import express from "express"
 import cors from "cors"
 import { DataQuotes, authors } from './data'
 
+
 let quotes = DataQuotes
 
 const app = express()
@@ -165,8 +166,6 @@ app.patch('/authors/:id', (req, res) => {
     }
   })
   
-
-
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
