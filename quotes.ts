@@ -1,6 +1,8 @@
 import express from "express"
 import cors from "cors"
 import { DataQuotes, authors } from './data'
+import Database from 'better-sqlite3'
+const db = Database('./db/quotes.db', { verbose: console.log })
 
 
 let quotes = DataQuotes
@@ -18,33 +20,64 @@ app.get('/', (req, res) => {
   `)
 })
 
+//GET QUOTES
+const getQuotes = db.prepare(`
+SELECT * FROM quotes;
+`)
+
 app.get('/quotes', (req, res) => {
-    let displayedquotes = quotes.map(quote =>{
-        let author = authors.find(author => author.id === quote.authorId)
-        return{...quote, author}
-    })
-    res.send(displayedquotes )
+  const quotes = getQuotes.all()
+  res.send(quotes)
 })
+//GET AUTHORS
+const getAuthors = db.prepare(`
+SELECT * FROM authors;
+`)
+
 app.get('/authors', (req, res) => {
-    let displayedauthors = authors.map(author =>{
-        let quote = quotes.find(quote => quote.authorId === author.id)
-        return{...author, quote}
-    })
-    res.send(displayedauthors )
+    const authors = getAuthors.all()
+    res.send(authors)
 })
+//GET QUOTES BY ID
+const getQuoteById = db.prepare(`
+SELECT * FROM quotes WHERE id = ?;
+`)
 
 app.get ('/quotes/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const sameid = quotes.find(quote => quote.id ===id)
-    if (sameid) {
-        res.send(sameid)
+  const id = Number(req.params.id)
+  const quote = getQuoteById.get(id)
+    if (quote) {
+        res.send(quote)
     }
     else {
         res.status(404).send({ error: `Quote doesn't exist!` })
     }
 }
 )
+//GET AUTHORS BY ID
+const getAuthorsById = db.prepare(`
+SELECT * FROM authors WHERE id = ?;
+`)
+
+app.get ('/authors/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const author = getAuthorsById.get(id)
+    if (author) {
+        res.send(author)
+    }
+    else {
+        res.status(404).send({ error: `Author doesn't exist!` })
+    }
+}
+)
+
+//POST QUOTE
+const postQuote = db.prepare(`
+INSERT INTO quotes (quote, authorId) VALUES (?, ?);
+`)
 app.post('/quotes', (req, res) => {
+  const quote = req.body.quote
+  const authorId = req.body.authorId
     let errors: string[] = []
     
     if (typeof req.body.authorId !== 'number') {
@@ -54,20 +87,11 @@ app.post('/quotes', (req, res) => {
     if(typeof req.body.quote  !=='string') {
         errors.push('Add a proper quote')
     }
-    let author = authors.find(author => author.id=== req.body.authorId)
-    if(!author) {
-        errors.push(`Author with this ID ${req.body.ownerId} doesn't exist.`)
-    }
 
     if( errors.length === 0)  {
-        const newquote = {
-            id: quotes[quotes.length - 1].id + 1,
-            authorId:req.body.authorId,
-            quote: req.body.quote
-        }
-    
-        quotes.push(newquote)
-        res.send(newquote)
+      const newquote = postQuote.run(quote, authorId)
+      const newquotes = getQuoteById.get(newquote.lastInsertRowid)
+      res.send(newquotes)
     }
     else {
         res.status(400).send({ errors: errors })

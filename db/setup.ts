@@ -149,6 +149,7 @@ const deleteAuthors = db.prepare(`
 DELETE from authors;
 `)
 deleteAuthors.run()
+
 const creaateAuthors = db.prepare(`
 INSERT INTO authors (name, lastname, age, image) VALUES (?,?,?,?);
 `)
