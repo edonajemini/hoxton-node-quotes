@@ -89,16 +89,22 @@ app.post('/quotes', (req, res) => {
     }
 
     if( errors.length === 0)  {
-      const newquote = postQuote.run(quote, authorId)
-      const newquotes = getQuoteById.get(newquote.lastInsertRowid)
+      const quotee = postQuote.run(quote, authorId)
+      const newquotes = getQuoteById.get(quotee.lastInsertRowid)
       res.send(newquotes)
     }
     else {
         res.status(400).send({ errors: errors })
       }
 })
+//POST AUTHORS
+//Doesnt work with images!!
 app.post('/authors', (req, res) => {
-    let errors: string[] = []
+  const name = req.body.name
+  const lastname = req.body.lastname
+  const age = req.body.age
+  const image = req.body.image
+  let errors: string[] = []
    
     if(typeof req.body.name !=='string') {
         errors.push('Add a proper name')
@@ -114,39 +120,38 @@ app.post('/authors', (req, res) => {
     }
   
     if( errors.length === 0)  {
-        const newauthor = {
-            id: quotes[quotes.length - 1].id + 1,
-            name:req.body.name,
-            lastname: req.body.lastname,
-            age: req.body.age,
-            image: req.body.image
-        }
-    
-        authors.push(newauthor)
-        res.send(newauthor)
+      const author = postQuote.run(name, lastname, age, image)
+      const newauthor = getAuthorsById.get(author.lastInsertRowid)
+      res.send(newauthor)
     }
     else {
         res.status(400).send({ errors: errors })
       }
 })
 
+//DELETE QUOTES
+const deleteQuotes = db.prepare(`
+DELETE FROM quotes WHERE id = ?;
+`)
+
 app.delete('/quotes/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const indextodelete = quotes.findIndex(quote => quote.id === id)
-    if (indextodelete > -1 ) {
-      quotes = quotes.filter( quote => quote.id !== id)
+  const id = Number(req.params.id)
+  const quote = deleteQuotes.run(id)
+    if (quote) {
         res.send({ message: 'Quote deleted successfully.' })
     }
     else {
         res.status(404).send({ error: 'Qoute not found.' })
       }
 })
-
+//PATCH QUOTES -Not done
+// const updateQuote = db.prepare(`
+// UPDATE people SET quote = ?, authorId = ? WHERE id = ?;
+// `)
 app.patch('/quotes/:id', (req, res) => {
-
+  
     let id = Number(req.params.id)
     let match = quotes.find(quote => quote.id === id)
-
     if (match) {
       if (req.body.quote) {
         match.quote = req.body.quote
@@ -155,7 +160,6 @@ app.patch('/quotes/:id', (req, res) => {
       if (req.body.authorId) {
         match.authorId = req.body.authorId
       }
-  
       res.send(match)
     } else {
 
